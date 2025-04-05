@@ -1,0 +1,625 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专业薪资计算工具 | 多端适配解决方案</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --dark: #1b263b;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f94144;
+            --glass: rgba(255, 255, 255, 0.15);
+            --shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.18);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --spacing: 1.5rem;
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: var(--spacing);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: calc(var(--spacing) * 2);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--dark);
+            opacity: 0.8;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius);
+            padding: var(--spacing);
+            margin-bottom: var(--spacing);
+            box-shadow: var(--shadow);
+            border: var(--border-glass);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease-out forwards;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(31, 38, 135, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: var(--radius);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--dark);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .result-card {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .result-card.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--dark);
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .final-salary {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .final-salary .result-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .final-salary .result-value {
+            color: white;
+            font-size: 2rem;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .history-date {
+            font-size: 0.8rem;
+            color: var(--dark);
+            opacity: 0.6;
+        }
+
+        .history-amount {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 0.5rem;
+        }
+
+        #otherIncome.highlight {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(249, 65, 68, 0.2);
+        }
+
+        #historyList {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: calc(var(--spacing) * 2);
+            color: var(--dark);
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>专业薪资计算工具</h1>
+            <p>多端适配解决方案，精准计算员工薪资，提供流畅的用户体验</p>
+        </header>
+
+        <section class="card" style="animation-delay: 0.2s;">
+            <div class="card-header">
+                <div class="card-icon">01</div>
+                <h2 class="card-title">薪资信息</h2>
+            </div>
+            
+            <div class="form-group">
+                <label for="username">员工姓名</label>
+                <input type="text" id="username" placeholder="请输入员工姓名">
+            </div>
+            
+            <div class="form-group">
+                <label for="attendanceMonth">考勤月份</label>
+                <input type="month" id="attendanceMonth">
+            </div>
+            
+            <div class="form-group">
+                <label for="baseSalary">基本工资</label>
+                <input type="number" id="baseSalary" placeholder="请输入基本工资" min="0">
+            </div>
+        </section>
+
+        <section class="card" style="animation-delay: 0.3s;">
+            <div class="card-header">
+                <div class="card-icon">02</div>
+                <h2 class="card-title">补贴信息</h2>
+            </div>
+            
+            <div class="form-group">
+                <label for="housingSubsidy">住房补贴</label>
+                <input type="number" id="housingSubsidy" placeholder="请输入住房补贴" min="0" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="mealSubsidy">餐费补贴</label>
+                <input type="number" id="mealSubsidy" placeholder="请输入餐费补贴" min="0" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="otherIncome">其他收入</label>
+                <input type="number" id="otherIncome" placeholder="请输入其他收入" min="0" value="0">
+            </div>
+        </section>
+
+        <section class="card" style="animation-delay: 0.4s;">
+            <div class="card-header">
+                <div class="card-icon">03</div>
+                <h2 class="card-title">考勤信息</h2>
+            </div>
+            
+            <div class="form-group">
+                <label for="restType">休息日类型</label>
+                <select id="restType">
+                    <option value="double">双休</option>
+                    <option value="single">单休</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="legalHolidays">请输入除单双休外，不重复假日天数</label>
+                <input type="number" id="legalHolidays" placeholder="法定假日天数" min="0" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="leaveDays">请假天数</label>
+                <input type="number" id="leaveDays" placeholder="请输入请假天数" min="0" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="overtimeDays">加班天数</label>
+                <input type="number" id="overtimeDays" placeholder="请输入加班天数" min="0" value="0">
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn" onclick="calculate()">计算薪资</button>
+                <button class="btn btn-secondary" onclick="resetForm()">重置表单</button>
+            </div>
+        </section>
+
+        <section id="result" class="card result-card" style="animation-delay: 0.5s;">
+            <div class="card-header">
+                <div class="card-icon">04</div>
+                <h2 class="card-title">薪资明细</h2>
+            </div>
+            
+            <div id="calcMonth" class="result-label" style="text-align: center; margin-bottom: 1rem;"></div>
+            
+            <div class="result-grid">
+                <div class="result-item">
+                    <div class="result-label">应出勤天数</div>
+                    <div id="shouldWorkDays" class="result-value">0</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label">实际出勤</div>
+                    <div id="actualWorkDays" class="result-value">0</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label">请假天数</div>
+                    <div id="displayLeave" class="result-value">0</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label">休息日</div>
+                    <div id="normalRest" class="result-value">0</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label">单双休外，法定假天数</div>
+                    <div id="displayHolidays" class="result-value">0</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label">日薪</div>
+                    <div id="dailySalary" class="result-value">0</div>
+                </div>
+                
+                <div class="result-item final-salary">
+                    <div class="result-label">最终薪资</div>
+                    <div id="finalSalary" class="result-value">0</div>
+                </div>
+            </div>
+            
+            <div class="btn-group" style="margin-top: 1.5rem;">
+                <button class="btn" onclick="saveRecord()">保存记录</button>
+                <button class="btn btn-secondary" onclick="exportToExcel()">导出Excel</button>
+            </div>
+        </section>
+
+        <section class="card" style="animation-delay: 0.6s;">
+            <div class="card-header">
+                <div class="card-icon">05</div>
+                <h2 class="card-title">历史记录</h2>
+            </div>
+            <div id="historyList"></div>
+        </section>
+
+        <footer>
+            <p>网页由CQY生成，仅供参考</p>
+            <p>www.baidu.com · 2025年</p>
+        </footer>
+    </div>
+
+    <script>
+        class AttendanceSystem {
+            constructor() {
+                this.records = JSON.parse(localStorage.getItem('salaryRecords')) || [];
+                this.historyList = document.getElementById('historyList');
+            }
+
+            addRecord(record) {
+                this.records.unshift(record);
+                if(this.records.length > 50) this.records.pop();
+                localStorage.setItem('salaryRecords', JSON.stringify(this.records));
+                this.render();
+            }
+
+            deleteRecord(index) {
+                this.records.splice(index, 1);
+                localStorage.setItem('salaryRecords', JSON.stringify(this.records));
+                this.render();
+            }
+
+            render() {
+                this.historyList.innerHTML = this.records.map((record, index) => `
+                    <div class="history-item">
+                        <div>
+                            <div class="history-date">${record.date}</div>
+                            <div>${record.name} - ${record.month}</div>
+                        </div>
+                        <div class="history-amount">￥${record.finalSalary}</div>
+                        <button class="delete-btn" onclick="system.deleteRecord(${index})">×</button>
+                    </div>
+                `).join('');
+            }
+
+            exportToExcel() {
+                const csvContent = [
+                    ['姓名', '月份', '底薪', '房补', '餐补', '其他收入', '最终薪资', '记录时间'],
+                    ...this.records.map(r => [
+                        r.name,
+                        r.month,
+                        r.baseSalary,
+                        r.housingSubsidy,
+                        r.mealSubsidy,
+                        r.otherIncome,
+                        r.finalSalary,
+                        r.date
+                    ])
+                ].map(e => e.join(",")).join("\n");
+
+                const blob = new Blob(["\ufeff"+csvContent], {type: 'text/csv;charset=utf-8;'});
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `薪资记录_${new Date().toLocaleDateString()}.csv`;
+                link.click();
+            }
+        }
+
+        // 其他收入输入框标红逻辑
+        document.getElementById('otherIncome').addEventListener('input', function() {
+            this.classList.toggle('highlight', this.value > 0);
+        });
+
+        function calculate() {
+            const name = document.getElementById('username').value.trim();
+            const month = document.getElementById('attendanceMonth').value;
+            const baseSalary = parseFloat(document.getElementById('baseSalary').value) || 0;
+            const housingSubsidy = parseFloat(document.getElementById('housingSubsidy').value) || 0;
+            const mealSubsidy = parseFloat(document.getElementById('mealSubsidy').value) || 0;
+            const otherIncome = parseFloat(document.getElementById('otherIncome').value) || 0;
+            const restType = document.getElementById('restType').value;
+            const legalHolidays = parseFloat(document.getElementById('legalHolidays').value) || 0;
+            const leaveDays = parseFloat(document.getElementById('leaveDays').value) || 0;
+            const overtimeDays = parseFloat(document.getElementById('overtimeDays').value) || 0;
+
+            if (!name || !month) {
+                alert('请填写姓名和考勤月份');
+                return;
+            }
+
+            const [year, monthNum] = month.split('-').map(Number);
+            const daysInMonth = new Date(year, monthNum, 0).getDate();
+            
+            // 计算实际休息日
+            let restDays = 0;
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = new Date(year, monthNum - 1, i).getDay();
+                if (restType === 'single') {
+                    if (day === 0) restDays++;
+                } else {
+                    if (day === 0 || day === 6) restDays++;
+                }
+            }
+
+            const shouldWorkDays = daysInMonth - restDays - legalHolidays;
+            const actualWorkDays = shouldWorkDays - leaveDays + overtimeDays;
+            const dailySalary = (baseSalary / shouldWorkDays).toFixed(2);
+            const salaryFromAttendance = (actualWorkDays * dailySalary).toFixed(2);
+            const finalSalary = (parseFloat(salaryFromAttendance) + housingSubsidy + mealSubsidy + otherIncome).toFixed(2);
+            
+            // 更新显示
+            document.getElementById('calcMonth').textContent = `${year}年${monthNum}月`;
+            document.getElementById('shouldWorkDays').textContent = shouldWorkDays;
+            document.getElementById('actualWorkDays').textContent = actualWorkDays;
+            document.getElementById('displayLeave').textContent = leaveDays;
+            document.getElementById('normalRest').textContent = restDays;
+            document.getElementById('displayHolidays').textContent = legalHolidays;
+            document.getElementById('dailySalary').textContent = dailySalary;
+            document.getElementById('finalSalary').textContent = finalSalary;
+            
+            document.getElementById('result').classList.add('show');
+        }
+
+        function resetForm() {
+            document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+                input.value = '';
+            });
+            document.getElementById('restType').value = 'double';
+            document.getElementById('result').classList.remove('show');
+        }
+
+        function saveRecord() {
+            const result = document.getElementById('result');
+            if (!result.classList.contains('show')) {
+                alert('请先计算薪资');
+                return;
+            }
+
+            const record = {
+                name: document.getElementById('username').value.trim(),
+                month: document.getElementById('attendanceMonth').value,
+                baseSalary: parseFloat(document.getElementById('baseSalary').value) || 0,
+                housingSubsidy: parseFloat(document.getElementById('housingSubsidy').value) || 0,
+                mealSubsidy: parseFloat(document.getElementById('mealSubsidy').value) || 0,
+                otherIncome: parseFloat(document.getElementById('otherIncome').value) || 0,
+                finalSalary: document.getElementById('finalSalary').textContent,
+                date: new Date().toLocaleString()
+            };
+            system.addRecord(record);
+            alert('记录保存成功！');
+        }
+
+        function exportToExcel() {
+            if (system.records.length === 0) {
+                alert('没有可导出的记录');
+                return;
+            }
+            system.exportToExcel();
+        }
+
+        const system = new AttendanceSystem();
+        system.render();
+
+        // 初始化动画
+        document.querySelectorAll('.card').forEach((card, index) => {
+            card.style.animationDelay = `${0.1 * index + 0.2}s`;
+        });
+    </script>
+</body>
+</html>
